@@ -13,7 +13,7 @@
     <string name="label_color">Color Filter</string>
     <string name="label_site">Site Filter</string>
     <string name="lavel_type">Image Type</string>
-    <string name="hint_site">"Restrict websites to selected website "</string>
+    <string name="hint_site">pinterest.com</string>
     <string name="label_save">Save</string>
 
     <string-array name="arr_colors">

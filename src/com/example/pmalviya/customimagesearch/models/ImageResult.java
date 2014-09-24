@@ -10,8 +10,8 @@ import org.json.JSONObject;
 public class ImageResult implements Serializable {
 	private String fullUrl;
 	private String tbUrl;
-	private int width;
-	private int height;
+	private float width;
+	private float height;
 	private String title;
 
 	public String getFullUrl() {
@@ -30,19 +30,19 @@ public class ImageResult implements Serializable {
 		this.tbUrl = tbUrl;
 	}
 
-	public int getWidth() {
+	public float getWidth() {
 		return width;
 	}
 
-	public void setWidth(int width) {
+	public void setWidth(float width) {
 		this.width = width;
 	}
 
-	public int getHeight() {
+	public float getHeight() {
 		return height;
 	}
 
-	public void setHeight(int height) {
+	public void setHeight(float height) {
 		this.height = height;
 	}
 
@@ -59,8 +59,8 @@ public class ImageResult implements Serializable {
 			this.fullUrl = json.getString("url");
 			this.tbUrl = json.getString("tbUrl");
 			this.title = json.getString("title");
-			this.width = Integer.parseInt(json.getString("width"));
-			this.height = Integer.parseInt(json.getString("height"));
+			this.width = Float.parseFloat(json.getString("width"));
+			this.height = Float.parseFloat(json.getString("height"));
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

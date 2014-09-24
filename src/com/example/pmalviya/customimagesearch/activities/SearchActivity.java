@@ -29,6 +29,7 @@ import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.Toast;
 
+import com.etsy.android.grid.StaggeredGridView;
 import com.example.pmalviya.customimagesearch.R;
 import com.example.pmalviya.customimagesearch.activities.SearchFiltersDialog.SearchFiltersDialogListener;
 import com.example.pmalviya.customimagesearch.adapters.ImageResultsAdapter;
@@ -41,7 +42,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 
 public class SearchActivity extends FragmentActivity {
 	private EditText etQuery;
-	private GridView gvResults;
+	private StaggeredGridView gvResults;
 	private String baseUrl = "https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=";
 	private ArrayList<ImageResult> imageResults;
 	private ImageResultsAdapter aImageResults;
@@ -49,6 +50,7 @@ public class SearchActivity extends FragmentActivity {
 	private HashMap<Integer,Integer> starts;
 	private String searchedUrl ="";
 	private SearchView searchView;
+	private boolean firstTimeLoad = true;
 	
 	AsyncHttpClient client = new AsyncHttpClient();
 	
@@ -74,7 +76,7 @@ public class SearchActivity extends FragmentActivity {
 				}
 				
 			});
-	//	}
+		//}
 	}
 	
     @Override
@@ -99,7 +101,7 @@ public class SearchActivity extends FragmentActivity {
     
     public void setupViews(){
     	etQuery  = (EditText) findViewById(R.id.etQuery);
-    	gvResults  = (GridView) findViewById(R.id.gvResults);
+    	gvResults  = (StaggeredGridView) findViewById(R.id.gvResults);
     	gvResults.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -123,14 +125,19 @@ public class SearchActivity extends FragmentActivity {
         searchView.setOnQueryTextListener(new OnQueryTextListener() {
            @Override
            public boolean onQueryTextSubmit(String query) {
-                // perform query here
-        	   onImageSearch(query);
+                // perform query here if it first time load
+        	   if(firstTimeLoad){
+        		   onImageSearch(query);
+        		   firstTimeLoad = false;
+        	   }
                 return true;
            }
 
            @Override
            public boolean onQueryTextChange(String newText) {
+        	   firstTimeLoad = true;
                return false;
+               
            }
        });
        return super.onCreateOptionsMenu(menu);

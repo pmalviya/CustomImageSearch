@@ -15,15 +15,19 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.ShareActionProvider;
 import android.widget.Toast;
@@ -31,17 +35,32 @@ import android.widget.Toast;
 public class ImageDisplayActivity extends Activity {
 
 	private ImageResult result;
-	private TouchImageView ivImageResult ;
+	private TouchImageView ivImageResult;
 	private ShareActionProvider miShareAction;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_image_display);
 		// hide action bar
-		//getActionBar().hide();
+		// getActionBar().hide();
+
 		result = (ImageResult) getIntent().getSerializableExtra("result");
 		ivImageResult = (TouchImageView) findViewById(R.id.ivImageResult);
-		Picasso.with(this).load(result.getFullUrl()).resize(600, 600).into(ivImageResult, new Callback(){
+		// calculate the aspectRatio
+		float aspectRatio = result.getWidth() / result.getHeight();
+		// Get the screen width
+		WindowManager wm = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
+		Display display = wm.getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		int screenWidth = size.x;
+		int calculatedHeight = (int) (screenWidth/ aspectRatio);
+		ivImageResult.getLayoutParams().height = calculatedHeight;
+		ivImageResult.getLayoutParams().width = screenWidth;
+		//resize(screenWidth, calculatedHeight)
+		
+		Picasso.with(this).load(result.getFullUrl()).resize(screenWidth, calculatedHeight).into(ivImageResult, new Callback() {
 
 			@Override
 			public void onError() {
@@ -50,65 +69,74 @@ public class ImageDisplayActivity extends Activity {
 
 			@Override
 			public void onSuccess() {
-				setupShareIntent();
-				
+				if (miShareAction == null) {
+					setupShareIntent();
+				}
+
 			}
-			
-		});
+
+		}) ;
 	}
-	// Gets the image URI and setup the associated share intent to hook into the provider
+
+	// Gets the image URI and setup the associated share intent to hook into the
+	// provider
 	public void setupShareIntent() {
-	    // Fetch Bitmap Uri locally
+		// Fetch Bitmap Uri locally
 		TouchImageView ivImage = (TouchImageView) findViewById(R.id.ivImageResult);
-	    Uri bmpUri = getLocalBitmapUri(ivImage); // see previous remote images section
-	    // Create share intent as described above
-	    Intent shareIntent = new Intent();
-	    shareIntent.setAction(Intent.ACTION_SEND);
-	    shareIntent.putExtra(Intent.EXTRA_STREAM, bmpUri);
-	    shareIntent.setType("image/*");
-	    // Attach share event to the menu item provider
-	    miShareAction.setShareIntent(shareIntent);
+		Uri bmpUri = getLocalBitmapUri(ivImage); // see previous remote images
+													// section
+		// Create share intent as described above
+		Intent shareIntent = new Intent();
+		shareIntent.setAction(Intent.ACTION_SEND);
+		shareIntent.putExtra(Intent.EXTRA_STREAM, bmpUri);
+		shareIntent.setType("image/*");
+		// Attach share event to the menu item provider
+		miShareAction.setShareIntent(shareIntent);
 	}
+
 	public Uri getLocalBitmapUri(TouchImageView imageView) {
-	    // Extract Bitmap from ImageView drawable
-	    Drawable drawable = imageView.getDrawable();
-	    Bitmap bmp = null;
-	    if (drawable instanceof BitmapDrawable){
-	       bmp = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-	    } else {
-	       return null;
-	    }
-	    // Store image to default external storage directory
-	    Uri bmpUri = null;
-	    try {
-	        File file =  new File(Environment.getExternalStoragePublicDirectory(  
-		        Environment.DIRECTORY_DOWNLOADS), "share_image_" + System.currentTimeMillis() + ".png");
-	        file.getParentFile().mkdirs();
-	        FileOutputStream out = new FileOutputStream(file);
-	        bmp.compress(Bitmap.CompressFormat.PNG, 90, out);
-	        out.close();
-	        bmpUri = Uri.fromFile(file);
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    }
-	    return bmpUri;
+		// Extract Bitmap from ImageView drawable
+		Drawable drawable = imageView.getDrawable();
+		Bitmap bmp = null;
+		if (drawable instanceof BitmapDrawable) {
+			bmp = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+		} else {
+			return null;
+		}
+		// Store image to default external storage directory
+		Uri bmpUri = null;
+		try {
+			File file = new File(Environment.getExternalStoragePublicDirectory(
+					Environment.DIRECTORY_DOWNLOADS), "share_image_" + System.currentTimeMillis() + ".png");
+			file.getParentFile().mkdirs();
+			FileOutputStream out = new FileOutputStream(file);
+			bmp.compress(Bitmap.CompressFormat.PNG, 90, out);
+			out.close();
+			bmpUri = Uri.fromFile(file);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return bmpUri;
 	}
-	public void onEmailClick(MenuItem mi){
+
+	public void onEmailClick(MenuItem mi) {
 		Intent shareIntent = new Intent(Intent.ACTION_SEND);
 		shareIntent.setType("image/*");
-		//Uri uri = Uri.fromFile(new File(getFilesDir(), "foo.jpg"));
+		// Uri uri = Uri.fromFile(new File(getFilesDir(), "foo.jpg"));
 		Uri uri = getLocalBitmapUri(ivImageResult);
 		shareIntent.putExtra(Intent.EXTRA_STREAM, uri.toString());
 		startActivity(Intent.createChooser(shareIntent, "Share image using"));
 	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.image_display, menu);
+
+		// Fetch reference to the share action provider
 		// Locate MenuItem with ShareActionProvider
-	    MenuItem item = menu.findItem(R.id.miEmail);
-	    // Fetch reference to the share action provider
-	    miShareAction = (ShareActionProvider) item.getActionProvider();
+		MenuItem item = menu.findItem(R.id.miEmail);
+		miShareAction = (ShareActionProvider) item.getActionProvider();
 		return true;
 	}
 

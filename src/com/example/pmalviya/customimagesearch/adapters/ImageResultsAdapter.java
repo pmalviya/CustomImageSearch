@@ -33,7 +33,7 @@ public class ImageResultsAdapter extends ArrayAdapter<ImageResult> {
 		
 		ivImage.setImageResource(0);
 		tvTitle.setText(Html.fromHtml(imageInfo.getTitle()));
-		Picasso.with(getContext()).load(imageInfo.getTbUrl()).into(ivImage);
+		Picasso.with(getContext()).load(imageInfo.getTbUrl()).fit().into(ivImage);
 		return convertView;
 	}
 

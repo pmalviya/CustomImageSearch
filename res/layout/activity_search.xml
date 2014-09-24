@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.pmalviya.customimagesearch.activities.SearchActivity" >
+    tools:context="com.example.pmalviya.customimagesearch.activities.SearchActivity" xmlns:app="http://schemas.android.com/apk/res/com.example.pmalviya.customimagesearch">
 <!-- 
     <EditText
         android:id="@+id/etQuery"
@@ -27,13 +27,13 @@
         android:text="@string/search_label" 
         android:onClick = "onImageSearch"/>
     -->
-    <GridView
+    <com.etsy.android.grid.StaggeredGridView
         android:id="@+id/gvResults"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/etQuery"
-        android:numColumns="3" >
-    </GridView>
+     	android:layout_below="@+id/etQuery"
+        app:column_count="3" />
 
 </RelativeLayout>
+  <!-- android:layout_below="@+id/etQuery"-->
