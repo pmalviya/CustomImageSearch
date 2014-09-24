@@ -69,7 +69,7 @@ public class ImageDisplayActivity extends Activity {
 
 			@Override
 			public void onSuccess() {
-				if (miShareAction == null) {
+				if (miShareAction != null) {
 					setupShareIntent();
 				}
 
