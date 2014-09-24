@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.pmalviya.customimagesearch.ImageDisplayActivity" >
+
+    <item
+        android:id="@+id/miEmail"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="Email friend"
+        android:icon="@drawable/ic_action_email"
+        android:onClick="onEmailClick"
+        android:actionProviderClass="android.widget.ShareActionProvider" />
+        
+</menu>
